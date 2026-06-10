@@ -1,26 +1,255 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
+@import "./theme.css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand Colors */
+  --primary: 34 197 94;
+  --primary-dark: 5 150 105;
+  --primary-light: 16 185 129;
+
+  /* Backgrounds */
+  --background: 248 250 249;
+  --card: 238 246 241;
+
+  /* Text */
+  --foreground: 17 24 39;
+  --muted-foreground: 75 85 99;
+
+  /* Borders */
+  --border: 209 250 229;
+
+  /* Basic */
+  --white: 255 255 255;
+
+  /* Radius */
+  --radius: 1rem;
+
+  /* ===== PREMIUM GRADIENTS & SHADOWS (NEW) ===== */
+  --gradient-primary: linear-gradient(135deg, rgb(5, 150, 105) 0%, rgb(34, 197, 94) 50%, rgb(16, 185, 129) 100%);
+  --gradient-primary-hover: linear-gradient(135deg, rgb(4, 120, 87) 0%, rgb(22, 163, 74) 50%, rgb(6, 148, 101) 100%);
+  --gradient-dark: linear-gradient(135deg, rgb(17, 24, 39) 0%, rgb(31, 41, 55) 100%);
+  --gradient-gold: linear-gradient(135deg, #F59E0B 0%, #FBBF24 50%, #FCD34D 100%);
+
+  /* Shadows */
+  --shadow-primary: 0 10px 25px -5px rgba(34, 197, 94, 0.4);
+  --shadow-primary-lg: 0 20px 35px -10px rgba(34, 197, 94, 0.5);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: rgb(var(--background));
+  color: rgb(var(--foreground));
+  font-family: var(--font-poppins), sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Hero Blinking Cursor */
+.hero-cursor-blink::after {
+  content: "|";
+  display: inline-block;
+  margin-left: 2px;
+  color: rgb(var(--primary));
+  font-weight: 300;
+  animation: blink-cursor 0.8s step-end infinite;
+}
+
+@keyframes blink-cursor {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+button {
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ===== BUTTON ANIMATIONS ===== */
+
+/* 1. Button Ripple Effect */
+@keyframes buttonRipple {
+  0% {
+    transform: scale(0);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(20);
+    opacity: 0;
+  }
+}
+
+/* 2. Glow Effect */
+@keyframes glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(34, 197, 94, 0.6);
+  }
+}
+
+/* 3. Shine Effect */
+@keyframes buttonShine {
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+  }
+
+  100% {
+    transform: translateX(200%) skewX(-15deg);
+  }
+}
+
+/* 4. Shake Effect */
+@keyframes buttonShake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* 5. Pulse Effect */
+@keyframes buttonPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
+/* ===== ANIMATION CLASSES ===== */
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.animate-shake {
+  animation: buttonShake 0.5s ease-in-out;
+}
+
+.animate-pulse-custom {
+  animation: buttonPulse 1.5s ease-in-out infinite;
+}
+
+/* Global transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Glass card utility */
+.glass-card {
+  background: rgba(var(--white), 0.2);
+  border: 1px solid rgba(var(--border), 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-primary);
+}
+
+/* ===== INTEGRATION SECTION — MARQUEE ANIMATIONS ===== */
+
+/* Desktop: Column A scrolls UP */
+@keyframes scrollUp {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
+}
+
+/* Desktop: Column B scrolls DOWN */
+@keyframes scrollDown {
+  from { transform: translateY(-50%); }
+  to   { transform: translateY(0); }
+}
+
+/* Mobile: Row 1 scrolls LEFT */
+@keyframes scrollLeft {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Mobile: Row 2 scrolls RIGHT */
+@keyframes scrollRight {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+
+/* Override global * transition so it doesn't fight the keyframe animation */
+.marquee-up,
+.marquee-down,
+.mobile-scroll-left,
+.mobile-scroll-right {
+  transition: none !important;
+  will-change: transform;
+}
+
+.marquee-up {
+  animation: scrollUp 22s linear infinite;
+}
+
+.marquee-down {
+  animation: scrollDown 22s linear infinite;
+}
+
+.mobile-scroll-left {
+  animation: scrollLeft 18s linear infinite;
+}
+
+.mobile-scroll-right {
+  animation: scrollRight 18s linear infinite;
+}
+
+/* Pause on hover — triggered when hovering ANY card inside the column */
+.marquee-col:hover .marquee-up,
+.marquee-col:hover .marquee-down,
+.marquee-col:hover .mobile-scroll-left,
+.marquee-col:hover .mobile-scroll-right {
+  animation-play-state: paused;
+}
+
+/* ===== WHY TRUST US — CARD HOVER GRADIENT ===== */
+
+.trust-card {
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+              background 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.trust-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(34, 197, 94, 0.4);
+  background: var(--gradient-primary);
+  box-shadow:
+    0 20px 40px -12px rgba(34, 197, 94, 0.35),
+    0 0 0 1px rgba(34, 197, 94, 0.15);
 }

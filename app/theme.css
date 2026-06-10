@@ -1,0 +1,19 @@
+@theme {
+  --font-sans: var(--font-poppins);
+
+  --color-primary: rgb(var(--primary));
+  --color-primary-dark: rgb(var(--primary-dark));
+  --color-primary-light: rgb(var(--primary-light));
+
+  --color-background: rgb(var(--background));
+  --color-card: rgb(var(--card));
+
+  --color-foreground: rgb(var(--foreground));
+  --color-muted-foreground: rgb(var(--muted-foreground));
+
+  --color-border: rgb(var(--border));
+
+  --color-white: rgb(var(--white));
+
+  --radius-lg: var(--radius);
+}
