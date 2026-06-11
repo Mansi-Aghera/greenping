@@ -32,12 +32,7 @@ const contactInfo = [
     value: "Chat with us",
     href: "https://wa.me/919876543210",
   },
-  {
-    icon: MapPin,
-    label: "Office",
-    value: "Bangalore, India",
-    href: "#",
-  },
+  
 ];
 
 export default function ContactUs() {
@@ -141,16 +136,7 @@ export default function ContactUs() {
               })}
             </div>
 
-            {/* office hours */}
-            <div className="flex items-center gap-3 rounded-2xl border border-border bg-white p-4">
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                <Clock size={18} className="text-primary" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Office Hours</p>
-                <p className="text-sm font-semibold text-foreground">Mon – Sat  |  9 AM – 7 PM IST</p>
-              </div>
-            </div>
+            
           </motion.div>
 
           {/* ── Right: form ── */}

@@ -64,11 +64,11 @@ const importantLinks = [
   },
   {
     label: "Support",
-    href: "#",
+    href: "#contact",
   },
   {
     label: "FAQ",
-    href: "#",
+    href: "#faq",
   },
 ];
 

@@ -77,7 +77,7 @@ export default function Features() {
   const radius = 300;
 
   return (
-    <section className="relative overflow-hidden py-5 lg:py-10">
+    <section id="features" className="relative overflow-hidden py-5 lg:py-10">
       {/* Background */}
       <div className="absolute inset-0 bg-background" />
 
