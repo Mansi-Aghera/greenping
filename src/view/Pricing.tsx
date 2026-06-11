@@ -1,465 +1,379 @@
+
+
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import Container from "@/src/components/ui/Container";
-import {
-  CheckCircle2,
-  Sparkles,
-  Zap,
-  Crown,
-  ArrowRight,
-  Star,
-  Shield,
-} from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Check, Zap, Star, Crown } from "lucide-react";
 
-/* ── billing periods ── */
-const periods = [
-  { label: "Monthly", key: "monthly", save: undefined },
-  { label: "6 Months", key: "6months", save: "10%" },
-  { label: "12 Months", key: "12months", save: "20%" },
-  { label: "18 Months", key: "18months", save: "30%" },
-] as const;
+// ─── Data ─────────────────────────────────────────────────────────────────────
 
-type PeriodKey = (typeof periods)[number]["key"];
-
-/* ── plan data ── */
-const plans = [
+const PLANS = [
   {
     name: "Free",
-    badge: "Starter",
-    icon: Zap,
-    tagline: "Start for free",
-    prices: {
-      monthly: 4000,
-      "6months": 3600,
-      "12months": 3200,
-      "18months": 2800,
-    },
-    popular: false,
+    Icon: Zap,
+    tagline: "Perfect for getting started",
+    monthlyPrice: 0,
+    annualPrice: 0,
+    featured: false,
     cta: "Get Started Free",
     features: [
-      { text: "Contacts", value: "10" },
-      { text: "Campaigns Per Month", value: "5" },
-      { text: "Bot Replies", value: "10" },
-      { text: "Bot Flows", value: "10" },
-      { text: "Contact Custom Fields", value: "2" },
-      { text: "Team Members/Agents", value: "5" },
-      { text: "AI Chat Bot", value: "✓" },
-      { text: "API and Webhook Access", value: "✓" },
+      "10 Contacts",
+      "5 Campaigns / Month",
+      "10 Bot Replies",
+      "10 Bot Flows",
+      "2 Contact Custom Fields",
+      "5 Team Members / Agents",
+      "AI Chat Bot",
+      "API & Webhook Access",
     ],
   },
   {
     name: "Premium",
-    badge: "Most Popular",
-    icon: Sparkles,
-    tagline: "Best for growing teams",
-    prices: {
-      monthly: 2500,
-      "6months": 2250,
-      "12months": 2000,
-      "18months": 1750,
-    },
-    popular: true,
-    cta: "Choose Plan",
+    Icon: Star,
+    tagline: "For growing businesses",
+    monthlyPrice: 2500,
+    annualPrice: 2000,
+    featured: true,
+    cta: "Choose Premium",
     features: [
-      { text: "Contacts", value: "1,000" },
-      { text: "Campaigns Per Month", value: "50" },
-      { text: "Bot Replies", value: "100" },
-      { text: "Bot Flows", value: "10" },
-      { text: "Contact Custom Fields", value: "100" },
-      { text: "Team Members/Agents", value: "10" },
-      { text: "AI Chat Bot", value: "✓" },
-      { text: "API and Webhook Access", value: "✓" },
+      "1,000 Contacts",
+      "50 Campaigns / Month",
+      "100 Bot Replies",
+      "10 Bot Flows",
+      "100 Contact Custom Fields",
+      "10 Team Members / Agents",
+      "AI Chat Bot",
+      "API & Webhook Access",
     ],
   },
   {
     name: "Ultimate",
-    badge: "Enterprise",
-    icon: Crown,
+    Icon: Crown,
     tagline: "Unlimited everything",
-    prices: {
-      monthly: 3500,
-      "6months": 3150,
-      "12months": 2800,
-      "18months": 2450,
-    },
-    popular: false,
-    cta: "Choose Plan",
+    monthlyPrice: 3500,
+    annualPrice: 2800,
+    featured: false,
+    cta: "Choose Ultimate",
     features: [
-      { text: "Contacts", value: "Unlimited" },
-      { text: "Campaigns Per Month", value: "Unlimited" },
-      { text: "Bot Replies", value: "Unlimited" },
-      { text: "Bot Flows", value: "Unlimited" },
-      { text: "Contact Custom Fields", value: "Unlimited" },
-      { text: "Team Members/Agents", value: "Unlimited" },
-      { text: "AI Chat Bot", value: "✓" },
-      { text: "API and Webhook Access", value: "✓" },
+      "Unlimited Contacts",
+      "Unlimited Campaigns",
+      "Unlimited Bot Replies",
+      "Unlimited Bot Flows",
+      "Unlimited Custom Fields",
+      "Unlimited Team Members",
+      "AI Chat Bot",
+      "API & Webhook Access",
     ],
   },
 ];
 
-export default function Pricing() {
-  const [period, setPeriod] = useState<PeriodKey>("monthly");
-  const [activePlan, setActivePlan] = useState(1); // Premium default
+// ─── Dot Grid Canvas ────────────────────────────────────────────────────────
+
+function DotGrid() {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const ctx = canvasRef.current.getContext("2d");
+    if (!ctx) return;
+    
+    const draw = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const sp = 22;
+      const r = 1.6;
+      
+      for (let x = 0; x <= canvas.width; x += sp) {
+        for (let y = 0; y <= canvas.height; y += sp) {
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(34, 197, 94, 0.12)";
+          ctx.fill();
+        }
+      }
+    };
+    
+    draw();
+    
+    const resizeObserver = new ResizeObserver(() => draw());
+    resizeObserver.observe(canvasRef.current);
+    
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   return (
-    <section id="pricing" className="relative overflow-hidden py-8 lg:py-16">
-      {/* ── Light background matching site ── */}
-      <div className="absolute inset-0 bg-background" />
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className="absolute inset-0 w-full h-full pointer-events-none z-0"
+    />
+  );
+}
 
-      {/* soft radial glow */}
+// ─── Plan Card Component ─────────────────────────────────────────────────────
+
+interface PlanCardProps {
+  plan: typeof PLANS[0];
+  isSelected: boolean;
+  billingCycle: "monthly" | "annually";
+  onSelect: () => void;
+}
+
+function PlanCard({ plan, isSelected, billingCycle, onSelect }: PlanCardProps) {
+  const { name, Icon, tagline, monthlyPrice, annualPrice, featured, cta, features } = plan;
+  const price = billingCycle === "monthly" ? monthlyPrice : annualPrice;
+  const isFree = price === 0;
+
+  const discountPercent =
+    billingCycle === "annually" && monthlyPrice > 0
+      ? Math.round(((monthlyPrice - annualPrice) / monthlyPrice) * 100)
+      : 0;
+
+  return (
+    <div
+      onClick={onSelect}
+      className={`
+        relative rounded-2xl sm:rounded-3xl flex flex-col h-full cursor-pointer transition-all duration-300
+        ${isSelected ? "scale-100 shadow-2xl" : "scale-100 hover:scale-[1.02] hover:shadow-xl"}
+      `}
+    >
+      {/* Gradient border wrapper for featured plan */}
+      {featured && !isSelected && (
+        <div
+          className="absolute inset-0 rounded-2xl sm:rounded-3xl p-px pointer-events-none"
+          style={{ background: "linear-gradient(135deg, #10b981, #14b8a6, #059669)" }}
+        />
+      )}
+
+      {/* Card body */}
       <div
-        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-        style={{
-          width: "110%",
-          height: "110%",
-          background:
-            "radial-gradient(ellipse 50% 40% at 50% 45%, rgba(34,197,94,0.06) 0%, transparent 65%)",
-        }}
-      />
-
-      {/* dot grid texture */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `radial-gradient(circle, rgb(var(--primary)) 1px, transparent 1px)`,
-          backgroundSize: "40px 40px",
-        }}
-      />
-
-      {/* corner blurs */}
-      <div className="absolute left-0 top-0 h-[400px] w-[400px] rounded-full bg-primary/6 blur-[120px]" />
-      <div className="absolute bottom-0 right-0 h-[400px] w-[400px] rounded-full bg-primary-light/6 blur-[120px]" />
-
-      <Container className="relative z-10">
-        {/* ── Heading ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          viewport={{ once: true }}
-          className="mx-auto mb-10 max-w-3xl text-center"
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.85 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            viewport={{ once: true }}
-            className="mb-5 inline-flex items-center gap-2.5 rounded-full border border-primary/20 bg-primary/10 px-5 py-2"
-          >
-            <Star size={13} className="fill-primary text-primary" />
-            <span className="text-sm font-semibold tracking-wide text-primary">
-              Simple, Transparent Pricing
-            </span>
-          </motion.div>
-
-          <h2 className="text-4xl font-extrabold leading-tight text-foreground md:text-5xl lg:text-6xl">
-            <span className="bg-gradient-to-r from-primary-dark via-primary to-primary-light bg-clip-text text-transparent">
-              GreenPing Solutions
-            </span>{" "}
-            User Plans
-          </h2>
-          <p className="mt-5 text-base text-muted-foreground md:text-lg">
-            Choose the plan that works best for your business needs.
-          </p>
-        </motion.div>
-
-        {/* ── Billing Toggle ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          viewport={{ once: true }}
-          className="relative mx-auto mb-14 flex w-fit items-center rounded-full border border-border bg-white p-1.5 shadow-sm"
-        >
-          {periods.map((p) => (
-            <button
-              key={p.key}
-              onClick={() => setPeriod(p.key)}
-              className={`relative z-10 flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-all duration-300 sm:px-5 ${
-                period === p.key
-                  ? "text-white"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+        className={`
+          relative rounded-2xl sm:rounded-3xl flex flex-col h-full transition-all duration-300 p-5 sm:p-6 lg:p-7
+          ${isSelected
+            ? "bg-gradient-to-br from-green-600 to-teal-700 text-white"
+            : featured
+              ? "bg-white"
+              : "bg-white border border-gray-200"
+          }
+        `}
+      >
+        {/* "Most Popular" badge */}
+        {featured && (
+          <div className="absolute -top-3 sm:-top-[14px] left-1/2 -translate-x-1/2 z-30 whitespace-nowrap pointer-events-none">
+            <span
+              className="inline-block px-3 sm:px-4 py-1 sm:py-[4px] rounded-full text-white text-[9px] sm:text-[10px] font-extrabold tracking-wide shadow-lg"
+              style={{ background: "linear-gradient(120deg, #059669, #0d9488)" }}
             >
-              {period === p.key && (
-                <motion.div
-                  layoutId="pricingPeriodBg"
-                  className="absolute inset-0 rounded-full shadow-[var(--shadow-primary)]"
-                  style={{ background: "var(--gradient-primary)" }}
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              )}
-              <span className="relative z-10">{p.label}</span>
-              {p.save && period === p.key && (
-                <span className="relative z-10 rounded-full bg-white/25 px-1.5 py-0.5 text-[10px] font-bold">
-                  -{p.save}
-                </span>
-              )}
-            </button>
-          ))}
-        </motion.div>
+              ⚡ Most Popular
+            </span>
+          </div>
+        )}
 
-        {/* ── Plan Cards ── */}
-        <div className="relative flex flex-col items-center gap-6 lg:flex-row lg:items-stretch lg:justify-center lg:gap-0">
-          {plans.map((plan, i) => {
-            const Icon = plan.icon;
-            const price = plan.prices[period];
-            const isActive = activePlan === i;
-
-            return (
-              <motion.div
-                key={plan.name}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: i * 0.15 }}
-                viewport={{ once: true }}
-                onClick={() => setActivePlan(i)}
-                className={`relative w-full max-w-[380px] cursor-pointer transition-all duration-500 lg:w-[360px] ${
-                  isActive
-                    ? "z-20 lg:scale-[1.08] lg:-mx-1"
-                    : "z-10 lg:scale-[0.96] opacity-60 hover:opacity-80"
-                }`}
-              >
-                {/* Gradient border ring for active */}
-                {isActive && (
-                  <motion.div
-                    layoutId="activePlanBorder"
-                    className="absolute -inset-[2px] rounded-[28px]"
-                    style={{ background: "var(--gradient-primary)" }}
-                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                  />
-                )}
-
-                {/* Green glow behind active card */}
-                {isActive && (
-                  <div className="pointer-events-none absolute -inset-4 rounded-[36px] bg-primary/15 blur-2xl" />
-                )}
-
-                {/* Card body */}
-                <div
-                  className={`relative flex h-full flex-col overflow-hidden rounded-[26px] border bg-white transition-all duration-500 ${
-                    isActive
-                      ? "border-transparent shadow-2xl"
-                      : "border-border shadow-sm"
-                  }`}
-                >
-                  {/* Popular ribbon */}
-                  {plan.popular && (
-                    <div className="absolute right-0 top-6 z-20">
-                      <div
-                        className="flex items-center gap-1.5 rounded-l-full py-1.5 pl-4 pr-0 text-xs font-bold text-white shadow-lg"
-                        style={{ background: "var(--gradient-primary)" }}
-                      >
-                        <Sparkles size={12} />
-                        MOST POPULAR
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Top section */}
-                  <div className="px-7 pb-0 pt-8">
-                    <div className="mb-4 flex items-center gap-3">
-                      <div
-                        className={`flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-300 ${
-                          isActive
-                            ? "bg-primary/15 shadow-[0_0_12px_rgba(34,197,94,0.2)]"
-                            : "bg-primary/8"
-                        }`}
-                      >
-                        <Icon
-                          size={20}
-                          className={
-                            isActive ? "text-primary" : "text-primary/50"
-                          }
-                        />
-                      </div>
-                      <div>
-                        <h3
-                          className={`text-lg font-bold transition-colors duration-300 ${
-                            isActive ? "text-foreground" : "text-foreground/50"
-                          }`}
-                        >
-                          {plan.name}
-                        </h3>
-                        <p
-                          className={`text-xs transition-colors duration-300 ${
-                            isActive
-                              ? "text-primary"
-                              : "text-muted-foreground/50"
-                          }`}
-                        >
-                          {plan.tagline}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Price */}
-                    <div className="mt-4 flex items-baseline gap-1.5">
-                      <span
-                        className={`text-sm font-medium transition-colors duration-300 ${
-                          isActive
-                            ? "text-foreground/60"
-                            : "text-foreground/25"
-                        }`}
-                      >
-                        ₹
-                      </span>
-                      <AnimatePresence mode="wait">
-                        <motion.span
-                          key={`${plan.name}-${price}`}
-                          initial={{ opacity: 0, y: 15 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -15 }}
-                          transition={{ duration: 0.25 }}
-                          className={`text-5xl font-extrabold tracking-tight transition-colors duration-300 ${
-                            isActive
-                              ? "bg-gradient-to-r from-primary-dark via-primary to-primary-light bg-clip-text text-transparent"
-                              : "text-foreground/30"
-                          }`}
-                        >
-                          {price.toLocaleString("en-IN")}
-                        </motion.span>
-                      </AnimatePresence>
-                      <div className="flex flex-col">
-                        <span
-                          className={`text-sm font-medium transition-colors duration-300 ${
-                            isActive
-                              ? "text-foreground/50"
-                              : "text-foreground/20"
-                          }`}
-                        >
-                          INR
-                        </span>
-                        <span
-                          className={`text-xs transition-colors duration-300 ${
-                            isActive
-                              ? "text-muted-foreground"
-                              : "text-foreground/15"
-                          }`}
-                        >
-                          /month
-                        </span>
-                      </div>
-                    </div>
-
-                    <p
-                      className={`mt-1.5 text-[11px] font-medium transition-colors duration-300 ${
-                        isActive ? "text-primary/70" : "text-foreground/15"
-                      }`}
-                    >
-                      + WhatsApp Cloud Messaging Charges
-                    </p>
-                  </div>
-
-                  {/* divider */}
-                  <div
-                    className={`mx-7 my-5 h-px transition-colors duration-300 ${
-                      isActive ? "bg-primary/20" : "bg-border"
-                    }`}
-                  />
-
-                  {/* Features */}
-                  <div className="flex-1 px-7">
-                    <ul className="space-y-2.5">
-                      {plan.features.map((f) => (
-                        <li key={f.text} className="flex items-center gap-2.5">
-                          <CheckCircle2
-                            size={15}
-                            className={`flex-shrink-0 transition-colors duration-300 ${
-                              isActive ? "text-primary" : "text-primary/25"
-                            }`}
-                          />
-                          <span
-                            className={`text-sm transition-colors duration-300 ${
-                              isActive
-                                ? "text-muted-foreground"
-                                : "text-foreground/25"
-                            }`}
-                          >
-                            <span
-                              className={`font-semibold transition-colors duration-300 ${
-                                isActive
-                                  ? "text-foreground"
-                                  : "text-foreground/35"
-                              }`}
-                            >
-                              {f.value}
-                            </span>{" "}
-                            {f.text}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* CTA */}
-                  <div className="px-7 pb-7 pt-6">
-                    <motion.button
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
-                      className={`flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold transition-all duration-300 ${
-                        isActive
-                          ? "text-white shadow-[var(--shadow-primary)]"
-                          : "border-2 border-border text-muted-foreground/60 hover:border-primary/30 hover:text-foreground"
-                      }`}
-                      style={
-                        isActive
-                          ? { background: "var(--gradient-primary)" }
-                          : undefined
-                      }
-                    >
-                      {plan.cta}
-                      <ArrowRight size={16} />
-                    </motion.button>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
+        {/* Icon */}
+        <div
+          className={`
+            w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center mb-3 sm:mb-4
+            ${isSelected
+              ? "bg-white/20 text-white"
+              : featured
+                ? "bg-gradient-to-br from-green-600 to-teal-600 text-white"
+                : "bg-green-50 text-green-600"
+            }
+          `}
+        >
+          <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${isSelected || featured ? "fill-white" : ""}`} />
         </div>
 
-        {/* ── Trust bar ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-          viewport={{ once: true }}
-          className="mx-auto mt-16 flex max-w-2xl flex-wrap items-center justify-center gap-6 md:gap-10"
+        {/* Name + tagline */}
+        <h3
+          className={`text-base sm:text-lg font-extrabold mb-0.5 leading-tight ${isSelected ? "text-white" : "text-gray-900"}`}
         >
-          {[
-            { icon: Shield, text: "SSL Encrypted" },
-            { icon: CheckCircle2, text: "No Hidden Fees" },
-            { icon: Star, text: "Cancel Anytime" },
-          ].map((t) => {
-            const TIcon = t.icon;
-            return (
-              <div key={t.text} className="flex items-center gap-2">
-                <TIcon size={14} className="text-primary/60" />
-                <span className="text-sm text-muted-foreground">{t.text}</span>
-              </div>
-            );
-          })}
-        </motion.div>
+          {name}
+        </h3>
+        <p className={`text-[10px] sm:text-xs mb-3 sm:mb-4 ${isSelected ? "text-teal-100" : "text-gray-400"}`}>
+          {tagline}
+        </p>
 
-        {/* ── Bottom note ── */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          viewport={{ once: true }}
-          className="mt-8 text-center text-sm text-muted-foreground"
+        {/* Price */}
+        <div className="mb-1">
+          {isFree ? (
+            <span className={`text-3xl sm:text-4xl font-extrabold ${isSelected ? "text-white" : "text-gray-900"}`}>
+              Free
+            </span>
+          ) : (
+            <div className="flex items-end gap-1 flex-wrap">
+              <span className={`text-sm font-medium ${isSelected ? "text-teal-100" : "text-gray-400"}`}>₹</span>
+              <span
+                className={`text-3xl sm:text-4xl font-extrabold leading-none ${isSelected ? "text-white" : "text-gray-900"}`}
+              >
+                {price.toLocaleString()}
+              </span>
+              <span className={`text-[10px] sm:text-xs mb-0.5 sm:mb-1 ${isSelected ? "text-teal-100" : "text-gray-400"}`}>
+                /mo
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Billing note */}
+        {!isFree && billingCycle === "annually" && discountPercent > 0 && (
+          <p className={`text-[8px] sm:text-[10px] font-medium mb-2 ${isSelected ? "text-teal-100" : "text-green-600"}`}>
+            Save {discountPercent}% – billed annually
+          </p>
+        )}
+        {!isFree && billingCycle === "monthly" && (
+          <p className={`text-[8px] sm:text-[10px] mb-2 ${isSelected ? "text-teal-100" : "text-gray-400"}`}>
+            Month‑to‑month billing
+          </p>
+        )}
+
+        <p className={`text-[8px] sm:text-[10px] mb-4 sm:mb-5 leading-snug ${isSelected ? "text-teal-100" : "text-gray-300"}`}>
+          + WhatsApp Cloud Messaging Charges
+        </p>
+
+        {/* CTA Button */}
+        <a
+          href="#"
+          onClick={(e) => e.stopPropagation()}
+          className={`
+            block text-center py-2.5 sm:py-3 rounded-xl font-semibold text-xs sm:text-sm transition-all mb-4 sm:mb-5
+            ${isSelected
+              ? "bg-white text-green-700 hover:bg-gray-100 shadow-md"
+              : featured
+                ? "bg-gradient-to-r from-green-600 to-teal-600 text-white hover:from-green-700 hover:to-teal-700 shadow-md hover:shadow-lg"
+                : "bg-gray-50 border border-gray-200 text-gray-700 hover:border-green-300 hover:bg-green-50"
+            }
+          `}
         >
-          All plans billed in INR. Need a custom enterprise plan?{" "}
-          <a
-            href="#contact"
-            className="font-semibold text-primary underline-offset-4 hover:underline"
+          {cta}
+        </a>
+
+        {/* Divider */}
+        <div className={`border-t mb-3 sm:mb-4 ${isSelected ? "border-teal-500" : "border-gray-100"}`} />
+
+        {/* Features list */}
+        <ul className="space-y-2 sm:space-y-2.5 flex-1">
+          {features.map((feature, idx) => (
+            <li key={idx} className={`flex items-start gap-1.5 sm:gap-2 text-[11px] sm:text-xs ${isSelected ? "text-teal-50" : "text-gray-500"}`}>
+              <Check className={`w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0 mt-0.5 ${isSelected ? "text-white" : "text-green-600"}`} />
+              <span className="leading-tight">{feature}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Pricing Component ──────────────────────────────────────────────────
+
+export default function Pricing() {
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "annually">("monthly");
+  const [selectedPlan, setSelectedPlan] = useState<number>(1);
+
+  return (
+    <section
+      id="pricing"
+      className="relative py-8 lg:py-16 overflow-hidden"
+      style={{ background: "#f0fdf4" }}
+    >
+      <DotGrid />
+
+      {/* Soft radial overlay */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-[1]"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 70% at 50% 50%, rgba(240,253,244,0.62), rgba(240,253,244,0.04))",
+        }}
+      />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-8 sm:mb-10 lg:mb-12 space-y-2 sm:space-y-3">
+          <div
+            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full border border-green-200
+                       text-[10px] sm:text-[11px] font-medium text-green-700 tracking-wide"
+            style={{ background: "rgba(255,255,255,0.8)", backdropFilter: "blur(4px)" }}
           >
-            Contact us →
+            <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-green-600 fill-green-600" />
+            Simple pricing
+          </div>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-extrabold text-gray-900 tracking-tight leading-[1.2] sm:leading-[1.08]">
+            Plans that{" "}
+            <span className="bg-gradient-to-r from-green-600 via-teal-500 to-green-600 bg-clip-text text-transparent">
+              scale with you
+            </span>
+          </h2>
+          <p className="text-gray-500 text-xs sm:text-sm lg:text-base max-w-xl mx-auto px-4">
+            Choose the plan that fits your business. Upgrade or downgrade anytime.
+          </p>
+        </div>
+
+        {/* Billing toggle */}
+        <div className="flex justify-center mb-8 sm:mb-10 lg:mb-12">
+          <div
+            className="inline-flex p-1 rounded-xl sm:rounded-2xl border border-green-200"
+            style={{ background: "rgba(255,255,255,0.8)", backdropFilter: "blur(4px)" }}
+          >
+            <button
+              onClick={() => setBillingCycle("monthly")}
+              className={`
+                px-4 sm:px-5 lg:px-6 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm lg:text-base font-medium transition-all whitespace-nowrap
+                ${billingCycle === "monthly"
+                  ? "bg-green-600 text-white shadow-sm"
+                  : "text-gray-500 hover:text-gray-900"
+                }
+              `}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setBillingCycle("annually")}
+              className={`
+                px-4 sm:px-5 lg:px-6 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm lg:text-base font-medium transition-all whitespace-nowrap
+                ${billingCycle === "annually"
+                  ? "bg-green-600 text-white shadow-sm"
+                  : "text-gray-500 hover:text-gray-900"
+                }
+              `}
+            >
+              Annually
+              <span className="hidden sm:inline ml-1 sm:ml-1.5 text-[8px] sm:text-[10px] font-semibold text-green-600">
+                Save 20%
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* Pricing Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-5 items-stretch">
+          {PLANS.map((plan, idx) => (
+            <PlanCard
+              key={plan.name}
+              plan={plan}
+              isSelected={selectedPlan === idx}
+              billingCycle={billingCycle}
+              onSelect={() => setSelectedPlan(idx)}
+            />
+          ))}
+        </div>
+
+        {/* Footer note */}
+        <p className="text-center text-gray-500 text-xs sm:text-sm mt-8 sm:mt-10">
+          Have questions about our pricing?{" "}
+          <a href="#contact" className="text-green-600 hover:underline font-medium transition-colors">
+            Contact us
           </a>
-        </motion.p>
-      </Container>
+        </p>
+      </div>
     </section>
   );
 }
