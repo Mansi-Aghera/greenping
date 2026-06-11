@@ -818,22 +818,20 @@ export default function Testimonials() {
               </div>
 
               {/* Overlapping Text Panel */}
-              <div
-                className={clsx(
-                  "relative z-10 flex flex-col justify-center p-5 sm:p-6 md:p-8 lg:p-10 rounded-2xl shadow-lg -mt-6 sm:mt-0 sm:-ml-8 md:-ml-12 lg:-ml-16 transition-colors duration-500 ease-in-out",
-                  isFeaturedHovered ? "bg-[rgb(var(--primary-dark))] shadow-[0_8px_30px_rgba(5,150,105,0.25)]" : "bg-[#f8f9fa]"
-                )}
-              >
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={`featured-${featuredIdx}`}
-                    variants={fadeVariants}
-                    initial="enter"
-                    animate="center"
-                    exit="exit"
-                    transition={{ duration: 0.4, ease: "easeInOut" }}
-                    className="flex flex-col"
-                  >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`featured-${featuredIdx}`}
+                  variants={fadeVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  className={clsx(
+                    "relative z-10 flex flex-col justify-center p-5 sm:p-6 md:p-8 lg:p-10 rounded-2xl shadow-lg -mt-6 sm:mt-0 sm:-ml-8 md:-ml-12 lg:-ml-16 transition-colors duration-500 ease-in-out",
+                    isFeaturedHovered ? "bg-[rgb(var(--primary-dark))] shadow-[0_8px_30px_rgba(5,150,105,0.25)]" : "bg-[#f8f9fa]"
+                  )}
+                >
+                  <div className="flex flex-col">
                     {/* Stars */}
                     <div className="flex gap-[2px]">
                       {Array.from({ length: 5 }).map((_, i) => (
@@ -887,36 +885,34 @@ export default function Testimonials() {
                         </p>
                       </div>
                     </div>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             </div>
 
             {/* PREVIEW CARD */}
-            <div
-              className={clsx(
-                "flex flex-col justify-center p-5 sm:p-6 md:p-8 lg:p-10 rounded-2xl shadow-sm transition-all duration-500 ease-in-out",
-                isPreviewHovered ? "bg-[rgb(var(--primary-dark))] shadow-[0_8px_30px_rgba(5,150,105,0.25)] -translate-y-1" : "bg-[#f8f9fa] hover:shadow-md hover:-translate-y-0.5"
-              )}
-              onMouseEnter={() => {
-                setHoveredCard("preview");
-                setIsPaused(true);
-              }}
-              onMouseLeave={() => {
-                setHoveredCard(null);
-                setIsPaused(false);
-              }}
-            >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={`preview-${previewIdx}`}
-                  variants={fadeVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.4, ease: "easeInOut" }}
-                  className="flex flex-col"
-                >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`preview-${previewIdx}`}
+                variants={fadeVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.4, ease: "easeInOut" }}
+                className={clsx(
+                  "flex flex-col justify-center p-5 sm:p-6 md:p-8 lg:p-10 rounded-2xl shadow-sm transition-all duration-500 ease-in-out",
+                  isPreviewHovered ? "bg-[rgb(var(--primary-dark))] shadow-[0_8px_30px_rgba(5,150,105,0.25)] -translate-y-1" : "bg-[#f8f9fa] hover:shadow-md hover:-translate-y-0.5"
+                )}
+                onMouseEnter={() => {
+                  setHoveredCard("preview");
+                  setIsPaused(true);
+                }}
+                onMouseLeave={() => {
+                  setHoveredCard(null);
+                  setIsPaused(false);
+                }}
+              >
+                <div className="flex flex-col">
                   {/* Stars */}
                   <div className="flex gap-[2px]">
                     {Array.from({ length: 5 }).map((_, i) => (
@@ -970,9 +966,9 @@ export default function Testimonials() {
                       </p>
                     </div>
                   </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </motion.div>
 
