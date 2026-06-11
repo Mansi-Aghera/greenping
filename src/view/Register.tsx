@@ -248,7 +248,7 @@ export default function Register() {
                         name="phone"
                         value={form.phone}
                         onChange={handleChange}
-                        placeholder="+91 98765 43210"
+                        placeholder=" +91 99980 16391"
                         className="w-full rounded-xl border border-border bg-white py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none transition-all duration-200 focus:border-primary focus:ring-2 focus:ring-primary/20"
                       />
                     </div>

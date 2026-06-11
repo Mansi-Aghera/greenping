@@ -20,13 +20,13 @@ import Container from "../components/ui/Container";
 const contactInfo = [
   {
     icon: Phone,
-    label: "+91 98765 43210",
+    label: " +91 99980 16391",
     href: "tel:+919876543210",
   },
   {
     icon: Mail,
-    label: "hello@greenping.com",
-    href: "mailto:hello@greenping.com",
+    label: "Support@greenpingsolutions.com",
+    href: "mailto:Support@greenpingsolutions.com",
   },
   {
     icon: MapPin,

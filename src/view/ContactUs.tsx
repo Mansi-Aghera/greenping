@@ -17,13 +17,13 @@ const contactInfo = [
   {
     icon: Mail,
     label: "Email Us",
-    value: "hello@greenping.in",
-    href: "mailto:hello@greenping.in",
+    value: " Info@greenpingsolutions.com",
+    href: "mailto: Info@greenpingsolutions.com",
   },
   {
     icon: Phone,
     label: "Call Us",
-    value: "+91 98765 43210",
+    value: " +91 99980 16391",
     href: "tel:+919876543210",
   },
   {
@@ -219,7 +219,7 @@ export default function ContactUs() {
                         name="phone"
                         value={form.phone}
                         onChange={handleChange}
-                        placeholder="+91 98765 43210"
+                        placeholder=" +91 99980 16391"
                         className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none transition-all duration-200 focus:border-primary focus:ring-2 focus:ring-primary/20"
                       />
                     </div>
